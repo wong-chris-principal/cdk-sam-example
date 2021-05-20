@@ -1,0 +1,67 @@
+Resources:
+  HelloHandlerServiceRole11EF7C63:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/HelloHandler/ServiceRole/Resource
+  HelloHandler2E4FBA4D:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3Bucket21A8D382
+        S3Key:
+          Fn::Join:
+            - ""
+            - - Fn::Select:
+                  - 0
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669
+              - Fn::Select:
+                  - 1
+                  - Fn::Split:
+                      - "||"
+                      - Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669
+      Role:
+        Fn::GetAtt:
+          - HelloHandlerServiceRole11EF7C63
+          - Arn
+      Handler: hello.handler
+      Runtime: nodejs14.x
+    DependsOn:
+      - HelloHandlerServiceRole11EF7C63
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/HelloHandler/Resource
+      aws:asset:path: /home/chris/Workplaces/cdk-sam-example/lambda
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAAAzWNSw7CMBBDz9L9dNqIzxqExBqVEwzpUKWfRMoksIhyd5qirmxLz7ZC1Z6wrS70lVr3U5O084zpGUhPcBXhsNrB2AE6Fhe9Zrg5K8FHHeD2tg/ytHBgX8KOZChzaabl1ROme7Q6GGcLsvsMhhZMnZt5a66aQQ41lUvB7TlnsK5nHKX5qCOqM6pqFGNqH20wC2P31x+OPW8TxQAAAA==
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CDKMetadata/Default
+Parameters:
+  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3Bucket21A8D382:
+    Type: String
+    Description: S3 bucket for asset "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
+  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669:
+    Type: String
+    Description: S3 key for asset version "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
+  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69ArtifactHashB8AB549C:
+    Type: String
+    Description: Artifact hash for asset "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
+
