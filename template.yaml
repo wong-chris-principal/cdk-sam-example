@@ -1,4 +1,147 @@
 Resources:
+  HelloTable2C0887DE:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/HelloTable/Resource
+  CdkPihkEEnrollmentStackRestApi52CBEC35:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: CdkPihkEEnrollmentStackRestApi
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Resource
+  CdkPihkEEnrollmentStackRestApiCloudWatchRole67412551:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/CloudWatchRole/Resource
+  CdkPihkEEnrollmentStackRestApiAccountF2179CEA:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn:
+        Fn::GetAtt:
+          - CdkPihkEEnrollmentStackRestApiCloudWatchRole67412551
+          - Arn
+    DependsOn:
+      - CdkPihkEEnrollmentStackRestApi52CBEC35
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Account
+  CdkPihkEEnrollmentStackRestApiDeploymentDD783D68c01a2817d50ced0bfda80a5f1b80f593:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+      Description: Automatically created by the RestApi construct
+    DependsOn:
+      - CdkPihkEEnrollmentStackRestApiGETDB00D1DA
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Deployment/Resource
+  CdkPihkEEnrollmentStackRestApiDeploymentStagedevE708F9CD:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+      DeploymentId:
+        Ref: CdkPihkEEnrollmentStackRestApiDeploymentDD783D68c01a2817d50ced0bfda80a5f1b80f593
+      MethodSettings:
+        - DataTraceEnabled: true
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          MetricsEnabled: true
+          ResourcePath: /*
+      StageName: dev
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/DeploymentStage.dev/Resource
+  CdkPihkEEnrollmentStackRestApiGETApiPermissionCdkPihkEEnrollmentStackCdkPihkEEnrollmentStackRestApi22E59CF2GETE0FE2725:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHandler2E4FBA4D
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:ap-east-1:303906804812:"
+            - Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+            - /
+            - Ref: CdkPihkEEnrollmentStackRestApiDeploymentStagedevE708F9CD
+            - /GET/
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Default/GET/ApiPermission.CdkPihkEEnrollmentStackCdkPihkEEnrollmentStackRestApi22E59CF2.GET..
+  CdkPihkEEnrollmentStackRestApiGETApiPermissionTestCdkPihkEEnrollmentStackCdkPihkEEnrollmentStackRestApi22E59CF2GETBB247C13:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - HelloHandler2E4FBA4D
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:ap-east-1:303906804812:"
+            - Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+            - /test-invoke-stage/GET/
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Default/GET/ApiPermission.Test.CdkPihkEEnrollmentStackCdkPihkEEnrollmentStackRestApi22E59CF2.GET..
+  CdkPihkEEnrollmentStackRestApiGETDB00D1DA:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId:
+        Fn::GetAtt:
+          - CdkPihkEEnrollmentStackRestApi52CBEC35
+          - RootResourceId
+      RestApiId:
+        Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :apigateway:ap-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - HelloHandler2E4FBA4D
+                  - Arn
+              - /invocations
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/CdkPihkEEnrollmentStackRestApi/Default/GET/Resource
   HelloHandlerServiceRole11EF7C63:
     Type: AWS::IAM::Role
     Properties:
@@ -17,12 +160,37 @@ Resources:
               - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
     Metadata:
       aws:cdk:path: CdkPihkEEnrollmentStack/HelloHandler/ServiceRole/Resource
+  HelloHandlerServiceRoleDefaultPolicyA2A0A4BB:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:Query
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:ConditionCheckItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - HelloTable2C0887DE
+                  - Arn
+              - Ref: AWS::NoValue
+        Version: "2012-10-17"
+      PolicyName: HelloHandlerServiceRoleDefaultPolicyA2A0A4BB
+      Roles:
+        - Ref: HelloHandlerServiceRole11EF7C63
+    Metadata:
+      aws:cdk:path: CdkPihkEEnrollmentStack/HelloHandler/ServiceRole/DefaultPolicy/Resource
   HelloHandler2E4FBA4D:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket:
-          Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3Bucket21A8D382
+          Ref: AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bS3BucketD71B2DB0
         S3Key:
           Fn::Join:
             - ""
@@ -30,38 +198,54 @@ Resources:
                   - 0
                   - Fn::Split:
                       - "||"
-                      - Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669
+                      - Ref: AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bS3VersionKeyC955563F
               - Fn::Select:
                   - 1
                   - Fn::Split:
                       - "||"
-                      - Ref: AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669
+                      - Ref: AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bS3VersionKeyC955563F
       Role:
         Fn::GetAtt:
           - HelloHandlerServiceRole11EF7C63
           - Arn
-      Handler: hello.handler
+      Environment:
+        Variables:
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
+      Handler: index.handler
       Runtime: nodejs14.x
     DependsOn:
+      - HelloHandlerServiceRoleDefaultPolicyA2A0A4BB
       - HelloHandlerServiceRole11EF7C63
     Metadata:
       aws:cdk:path: CdkPihkEEnrollmentStack/HelloHandler/Resource
-      aws:asset:path: /home/chris/Workplaces/cdk-sam-example/lambda
+      aws:asset:path: /home/chris/Workplaces/cdk-sam-example/cdk.out/asset.a811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622b
       aws:asset:property: Code
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAAAzWNSw7CMBBDz9L9dNqIzxqExBqVEwzpUKWfRMoksIhyd5qirmxLz7ZC1Z6wrS70lVr3U5O084zpGUhPcBXhsNrB2AE6Fhe9Zrg5K8FHHeD2tg/ytHBgX8KOZChzaabl1ROme7Q6GGcLsvsMhhZMnZt5a66aQQ41lUvB7TlnsK5nHKX5qCOqM6pqFGNqH20wC2P31x+OPW8TxQAAAA==
+      Analytics: v2:deflate64:H4sIAAAAAAAAA01Q207DMAz9lr2n3iouz5Qh3oBp8ANuarp0TVLFCVMV9d9JUirx5GOf4+NLDfXhAQ67J7xxJbvrPkrrCOKnR3kVZ2IbnCRx/DYfwU/Bi4aZfGJ7ZXpxtIa9C9JnwQkdavLkcrJ1LiIbx242qG3XQvzCdix+BSR6Uj16uuEMMTX5ZlJ//RtspLTBePFC02hnTaZM+5flbYrlCrbRz8gk3shfbJfJFS1CoU6T7LpEiSc7KjmXEwpaxIi67RBiLpHTillZkwWvwUif8CapjO1oYHgvYWMF31WY/8RQ3rUsIutg4P1PfQ/1I9S7gZWqXLpLaYLzGn8Bki8L8I0BAAA=
     Metadata:
       aws:cdk:path: CdkPihkEEnrollmentStack/CDKMetadata/Default
+Outputs:
+  CdkPihkEEnrollmentStackRestApiEndpoint7163B7B5:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: CdkPihkEEnrollmentStackRestApi52CBEC35
+          - .execute-api.ap-east-1.
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: CdkPihkEEnrollmentStackRestApiDeploymentStagedevE708F9CD
+          - /
 Parameters:
-  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3Bucket21A8D382:
+  AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bS3BucketD71B2DB0:
     Type: String
-    Description: S3 bucket for asset "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
-  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69S3VersionKeyA2813669:
+    Description: S3 bucket for asset "a811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622b"
+  AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bS3VersionKeyC955563F:
     Type: String
-    Description: S3 key for asset version "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
-  AssetParameters12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69ArtifactHashB8AB549C:
+    Description: S3 key for asset version "a811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622b"
+  AssetParametersa811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622bArtifactHashE5140F5E:
     Type: String
-    Description: Artifact hash for asset "12dd0d11112f513d8e6c9b2d1f99675318a6f6ed17ef9416c45601b1edc92f69"
+    Description: Artifact hash for asset "a811eff974d2d288011f1ad449a7e3af1a240da679333d9083e134ebd5fa622b"
 
